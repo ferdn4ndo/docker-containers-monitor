@@ -6,12 +6,18 @@ set -o pipefail
 # shellcheck disable=SC1091
 source ./functions.sh
 
-printHeader "Bash Container Template"
+printHeader "Docker Conatiners Monitor"
 
-printMsg "Calling the dummy service..."
-./dummy.sh
+printMsg "Starting the Nginx server"
+nginx
 
-if [[ "$RUN_CONTAINER_FOREVER" == "1" ]]; then
-    printMsg "The RUN_CONTAINER_FOREVER variable is set to 1, entering 'tail -f /dev/null' command..."
-    tail -f /dev/null
-fi
+REFRESH_EVERY_SECONDS=${REFRESH_EVERY_SECONDS:-5}
+
+printMsg "Starting the stats watcher refreshing every $REFRESH_EVERY_SECONDS second(s)"
+
+mkfifo /tmp/mypipe
+
+nohup watch -n"$REFRESH_EVERY_SECONDS" "sh /scripts/refresh.sh" > /dev/null & tail -f /tmp/mypipe
+
+printMsg "Reading the custom pipe output"
+tail -f /tmp/mypipe

@@ -17,7 +17,7 @@ function printMsg() {
     fi
 
     # shellcheck disable=SC2059
-    printf "${2}${1}${COLOR_OFF}\n"
+    printf "%b%s${COLOR_OFF}\n" "${2}" "${1}"
 }
 
 function printTitle() {
@@ -32,17 +32,22 @@ function printTitle() {
         title="${1}"
     fi
 
-    printMsg "$title" "${COLOR_BACKGROUND_BLUE}${COLOR_BOLD_WHITE}"
+    printMsg "$title"
+}
+
+function printSpacer() {
+    printf '=%.0s' $(seq 1 $TERMWIDTH)
 }
 
 function printHeader() {
-    spacer=$(printf '=%.0s' $(seq 1 $TERMWIDTH))
+    spacer=$(printSpacer)
 
     printMsg ""
 
     printMsg "$spacer" "${COLOR_BACKGROUND_BLUE}${COLOR_BOLD_WHITE}"
 
-    printTitle "${1}"
+    title=$(printTitle "${1}")
+    printMsg "$title" "${COLOR_BACKGROUND_BLUE}${COLOR_BOLD_WHITE}"
 
     printMsg "$spacer" "${COLOR_BACKGROUND_BLUE}${COLOR_BOLD_WHITE}"
 

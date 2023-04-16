@@ -17,8 +17,6 @@ jobs: # Docs: <https://git.io/JvxXE>
   scan-image:
     name: Check for packages vulnerabilities with Grype
     runs-on: ubuntu-20.04
-    env:
-      RUN_CONTAINER_FOREVER: 1
     steps:
       - name: Check out code
         uses: actions/checkout@v3
@@ -27,7 +25,7 @@ jobs: # Docs: <https://git.io/JvxXE>
         run: >
           docker build
           --file ./Dockerfile
-          --tag bash-container-template:local
+          --tag docker-containers-monitor:local
           --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
           --build-arg BUILD_VERSION=${{ github.event.release.tag_name }}
           --build-arg VCS_REF=${GITHUB_SHA}
@@ -40,7 +38,7 @@ jobs: # Docs: <https://git.io/JvxXE>
         uses: anchore/scan-action@v3 # action page: <https://github.com/anchore/scan-action>
         id: scan
         with:
-          image: bash-container-template:local
+          image: docker-containers-monitor:local
           fail-build: false
           severity-cutoff: low # negligible, low, medium, high or critical
 
