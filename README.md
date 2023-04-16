@@ -1,24 +1,29 @@
-# Bash Container Template
+# Docker Containers Monitor
 
-[![Docker Image Size (tag)](https://img.shields.io/docker/image-size/ferdn4ndo/bash-container-template/latest)](https://hub.docker.com/r/ferdn4ndo/bash-container-template)
-[![E2E test status](https://github.com/ferdn4ndo/bash-container-template/actions/workflows/test_ut_e2e.yaml/badge.svg?branch=main)](https://github.com/ferdn4ndo/bash-container-template/actions)
-[![GitLeaks test status](https://github.com/ferdn4ndo/bash-container-template/actions/workflows/test_code_leaks.yaml/badge.svg?branch=main)](https://github.com/ferdn4ndo/bash-container-template/actions)
-[![Grype test status](https://github.com/ferdn4ndo/bash-container-template/actions/workflows/test_grype_scan.yaml/badge.svg?branch=main)](https://github.com/ferdn4ndo/bash-container-template/actions)
-[![ShellCheck test status](https://github.com/ferdn4ndo/bash-container-template/actions/workflows/test_code_quality.yaml/badge.svg?branch=main)](https://github.com/ferdn4ndo/bash-container-template/actions)
-[![Release](https://img.shields.io/github/v/release/ferdn4ndo/bash-container-template)](https://github.com/ferdn4ndo/bash-container-template/releases)
+[![Docker Image Size (tag)](https://img.shields.io/docker/image-size/ferdn4ndo/docker-containers-monitor/latest)](https://hub.docker.com/r/ferdn4ndo/docker-containers-monitor)
+[![E2E test status](https://github.com/ferdn4ndo/docker-containers-monitor/actions/workflows/test_ut_e2e.yaml/badge.svg?branch=main)](https://github.com/ferdn4ndo/docker-containers-monitor/actions)
+[![GitLeaks test status](https://github.com/ferdn4ndo/docker-containers-monitor/actions/workflows/test_code_leaks.yaml/badge.svg?branch=main)](https://github.com/ferdn4ndo/docker-containers-monitor/actions)
+[![Grype test status](https://github.com/ferdn4ndo/docker-containers-monitor/actions/workflows/test_grype_scan.yaml/badge.svg?branch=main)](https://github.com/ferdn4ndo/docker-containers-monitor/actions)
+[![ShellCheck test status](https://github.com/ferdn4ndo/docker-containers-monitor/actions/workflows/test_code_quality.yaml/badge.svg?branch=main)](https://github.com/ferdn4ndo/docker-containers-monitor/actions)
+[![Release](https://img.shields.io/github/v/release/ferdn4ndo/docker-containers-monitor)](https://github.com/ferdn4ndo/docker-containers-monitor/releases)
+![nginx 1.23.4](https://img.shields.io/badge/nginx-1.23.4-brightgreen.svg)
 [![MIT license](https://img.shields.io/badge/license-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT)
 
-An Alpine-based docker image template for bash-based services, including a complete CI workflow with UTs and E2E validation. Protected against code leakage by [GitLeaks](https://github.com/gitleaks/gitleaks-action/) and package vulnerabilities by [Anchore Grype](https://github.com/anchore/grype). CI pipeline with code quality check by [Shellcheck](https://github.com/koalaman/shellcheck), internal Unit Tests (UTs), and E2E Automated Test (ATs).
+A lightweight docker image for monitoring containers' resource usage and memory load in a web server with a simple UI. Includes a complete CI workflow with internal Unit Tests (UTs), and E2E Automated Tests (ATs). Protected against code leakage by [GitLeaks](https://github.com/gitleaks/gitleaks-action/) and package vulnerabilities by [Anchore Grype](https://github.com/anchore/grype). Code quality check by [ShellCheck](https://github.com/koalaman/shellcheck).
 
 ## Main features
 
 * Lightweight (Alpine-based) docker image;
+* Provides containers monitoring using `docker ps`;
+* Provides disk usage statistics (from the host) using `df`;
+* Provides memory usage statistics (from the host) using `cat /proc/meminfo`;
+* Customizable refresh interval;
+* Easy to expand for custom needs;
 * Unit tests for the custom bash functions;
-* Supports colored messages and provides built-in methods for printing decorated messages;
 * Code leakage check on every push by [GitLeaks](https://github.com/gitleaks/gitleaks-action/);
 * Third-packages vulnerabilities test on every push by [Anchore Grype](https://github.com/anchore/grype);
 * Automatic code quality check on every push by [Shellcheck](https://github.com/koalaman/shellcheck);
-* Custom E2E test using [custom Github Actions](https://github.com/ferdn4ndo/bash-container-template/blob/main/.github/workflows/test_ut_e2e.yaml);
+* UT and E2E validation using [custom Github Actions](https://github.com/ferdn4ndo/docker-containers-monitor/blob/main/.github/workflows/test_ut_e2e.yaml);
 
 ## Summary
 
@@ -31,8 +36,14 @@ An Alpine-based docker image template for bash-based services, including a compl
   * [Running in docker-compose](#running-in-docker-compose)
 * [Configuring](#configuring)
   * [General Configuration](#general-configuration)
-    * [RUN_CONTAINER_FOREVER](#run_container_forever)
+    * [VIRTUAL_HOST](#virtual_host)
+    * [LETSENCRYPT_HOST](#letsencrypt_host)
+    * [LETSENCRYPT_EMAIL](#letsencrypt_email)
+    * [REFRESH_EVERY_SECONDS](#refresh_every_seconds)
+    * [STATS_FILE](#stats_file)
 * [Testing](#testing)
+  * [Unit Tests (UTs)](#unit-tests-uts)
+  * [End-to-End (E2E) Tests](#end-to-end-e2e-tests)
 * [Contributing](#contributing)
   * [Contributors](#contributors)
 * [License](#license)
@@ -59,30 +70,39 @@ Then edit the file accordingly. Check the [Configuring](#configuring) section fo
 
 ### Building the image
 
-To build the image (assuming the `bash-container-template` image name and the `latest` tag) use the following command in the project root folder:
+To build the image (assuming the `docker-containers-monitor` image name and the `latest` tag) use the following command in the project root folder:
 
 ```bash
-docker build -f ./Dockerfile --tag bash-container-template:latest
+docker build -f ./Dockerfile --tag docker-containers-monitor:latest
 ```
 
 After setting up the environment and building the image, you can now launch a container with it. Considering the `.env` file prepare in the previous section, use the following command in the project root folder:
 
 ```bash
-docker run --rm -v "./scripts:/scripts" --env-file ./.env --name "bash-container-template" bash-container-template:latest
+docker run --rm -v "./scripts:/scripts" -v "./html:/usr/share/nginx/html" -v "/var/run/docker.sock:/var/run/docker.sock:ro" --env-file ./.env -p "80:80" --name "docker-containers-monitor" docker-containers-monitor:latest
 ```
+
+Note that the volumes `-v "./scripts:/scripts"` and `-v "./html:/usr/share/nginx/html"` are only needed when you want a hot-reload feature in the development environment (not needed in production), but the `-v "/var/run/docker.sock:/var/run/docker.sock:ro"` mount is always needed since the service must connect to the host' docker server in order to gather information about the other running containers.
 
 ### Running in docker-compose
 
-As this repository has a Docker image available for pulling, we can add this service to an existing stack by creating a service using the `ferdn4ndo/bash-container-template:latest` identifier:
+As this repository has a Docker image available for pulling, we can add this service to an existing stack by creating a service using the `ferdn4ndo/docker-containers-monitor:latest` identifier:
 
 ```yaml
 services:
   ...
-  bash-container-template:
-    image: ferdn4ndo/bash-container-template:latest
-    container_name: bash-container-template
+  docker-containers-monitor:
+    image: ferdn4ndo/docker-containers-monitor:latest
+    container_name: docker-containers-monitor
     env_file:
       - ./.env
+    ports:
+      - "80:80" # Remove when running behind a reverse proxy
+    volumes:
+      - ./scripts:/scripts # Optional - for hot file swap only
+      - ./html:/usr/share/nginx/html # Optional - for hot file swap only
+      - ./default.conf:/etc/nginx/conf.d/default.conf # Optional - for hot file swap only
+      - /var/run/docker.sock:/var/run/docker.sock:ro # Required to access information about other running containers
   ...
 ```
 
@@ -92,17 +112,53 @@ The service is configured using environment variables. They are listed and descr
 
 ### General Configuration
 
-#### **RUN_CONTAINER_FOREVER**
+#### **VIRTUAL_HOST**
 
-Determines if the container should exit right after displaying the dummy message (`0` - default), or if the entrypoint should execute a `tail -f /dev/null` command, basically entering in a forever loop of nothing (useful for debugging and entering the container to execute commands manually).
+When running behind [nginx-proxy](https://github.com/nginx-proxy/nginx-proxy), use this variable to set the domain to which the container will be exposed.
 
 Required: **NO**
 
-Default: `0`
+Default: *EMPTY*
+
+#### **LETSENCRYPT_HOST**
+
+When running behind [nginx-proxy](https://github.com/nginx-proxy/nginx-proxy) with SSL by [Let's Encrypt](https://github.com/nginx-proxy/acme-companion), use this variable to set the domain to which the certificate will be issued.
+
+Required: **NO**
+
+Default: *EMPTY*
+
+#### **LETSENCRYPT_EMAIL**
+
+When running behind [nginx-proxy](https://github.com/nginx-proxy/nginx-proxy) with SSL by [Let's Encrypt](https://github.com/nginx-proxy/acme-companion), use this variable to set the e-mail of the owner of the certificate that will be issued.
+
+Required: **NO**
+
+Default: *EMPTY*
+
+#### **REFRESH_EVERY_SECONDS**
+
+Determine the interval in seconds to call the heartbeat refresh script and update the stats.
+
+Required: **NO**
+
+Default: `5`
+
+#### **STATS_FILE**
+
+The path of the file that will be refreshed at every `REFRESH_EVERY_SECONDS` containing the instant stats.
+
+Required: **NO**
+
+Default: `/usr/share/nginx/html/stats.txt`
 
 ## Testing
 
-To execute the ATs, make sure that both the `bash-container-template` container is up and running.
+The repository pipelines also include testing for code leaks at [.github/workflows/test_code_leaks.yaml](https://github.com/ferdn4ndo/docker-containers-monitor/blob/main/.github/workflows/test_code_leaks.yaml), testing for package vulnerabilities at [.github/workflows/test_grype_scan.yaml](https://github.com/ferdn4ndo/docker-containers-monitor/blob/main/.github/workflows/test_grype_scan.yaml), testing for code quality at [.github/workflows/test_code_quality.yaml](https://github.com/ferdn4ndo/docker-containers-monitor/blob/main/.github/workflows/test_code_quality.yaml), and UTs (which will call the `run_*_tests.sh` scripts) + E2E functional tests at [.github/workflows/test_ut_e2e.yaml](https://github.com/ferdn4ndo/docker-containers-monitor/blob/main/.github/workflows/test_ut_e2e.yaml), which are described in the sections below.
+
+### Unit Tests (UTs)
+
+To execute the UTs, make sure that the `docker-containers-monitor` container is up and running.
 
 This can be achieved by running the `docker-compose.yaml` file:
 
@@ -110,15 +166,27 @@ This can be achieved by running the `docker-compose.yaml` file:
 docker compose up --build --remove-orphans
 ```
 
-Then, after the container is up and running, execute this command in the terminal to run the test script inside the `bash-container-template` container:
+Then, after the container is up and running, execute this command in the terminal to run the test script inside the `docker-containers-monitor` container:
 
 ```bash
-docker exec -it bash-container-template sh -c "./run_tests.sh"
+# The UTs script must be executed from inside the service container
+docker exec -it docker-containers-monitor sh -c "./run_unit_tests.sh"
 ```
 
 The script will successfully execute if all the tests have passed or will abort with an error otherwise. The output is verbose, give a check.
 
-The repository pipelines also include testing for code leaks at [.github/workflows/test_code_leaks.yaml](https://github.com/ferdn4ndo/bash-container-template/blob/main/.github/workflows/test_code_leaks.yaml), testing for package vulnerabilities at [.github/workflows/test_grype_scan.yaml](https://github.com/ferdn4ndo/bash-container-template/blob/main/.github/workflows/test_grype_scan.yaml), testing for code quality at [.github/workflows/test_code_quality.yaml](https://github.com/ferdn4ndo/bash-container-template/blob/main/.github/workflows/test_code_quality.yaml), and UTs (which will call the `run_tests.sh` script) + E2E functional tests at [.github/workflows/test_ut_e2e.yaml](https://github.com/ferdn4ndo/bash-container-template/blob/main/.github/workflows/test_ut_e2e.yaml).
+### End-to-End (E2E) Tests
+
+To execute the ATs (as in the UTs), please first make sure that the `docker-containers-monitor` container is up and running.
+
+Then, **from the host terminal (not inside the container)**, execute the E2E test script:
+
+```bash
+# The E2E test script must be executed from the HOST machine (outside the service container)
+./scripts/run_e2e_tests.sh
+```
+
+The script will successfully execute if all the tests have passed or will abort with an error otherwise. The output is verbose, give a check.
 
 ## Contributing
 
@@ -132,4 +200,4 @@ Any help is appreciated! Feel free to review, open an issue, fork, and/or open a
 
 ## License
 
-This application is distributed under the [MIT](https://github.com/ferdn4ndo/bash-container-template/blob/main/LICENSE) license.
+This application is distributed under the [MIT](https://github.com/ferdn4ndo/docker-containers-monitor/blob/main/LICENSE) license.

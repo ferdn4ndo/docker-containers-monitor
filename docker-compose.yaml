@@ -1,11 +1,16 @@
 version: '3'
 services:
-  bash-container-template:
+  docker-containers-monitor:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: bash-container-template
+    container_name: docker-containers-monitor
     env_file:
       - ./.env
+    ports:
+      - "80:80" # Remove when running behind a reverse proxy
     volumes:
-      - ./scripts:/scripts
+      - ./scripts:/scripts # Optional - for hot file swap only
+      - ./html:/usr/share/nginx/html # Optional - for hot file swap only
+      - ./default.conf:/etc/nginx/conf.d/default.conf # Optional - for hot file swap only
+      - /var/run/docker.sock:/var/run/docker.sock:ro # Required to access information about other running containers

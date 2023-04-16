@@ -10,13 +10,49 @@ source ./strings.sh
 ### Custom service methods will go here
 ###
 
-function printLoremIpsum() {
-    printMsg "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-    printMsg "Sed et ipsum molestie justo aliquam lacinia vitae in nibh."
-    printMsg "Sed ultricies aliquam dapibus. Mauris sodales velit at enim"
-    printMsg "lobortis eleifend. Aenean ac libero nec neque maximus"
-    printMsg "scelerisque. Praesent venenatis sem utefficitur tempus. Maecenas"
-    printMsg "a nulla at erat aliquam luctus id sed est. Nullam lacinia vel"
-    printMsg "enim ac sodales. Donec ex velit, finibus quis massa hendrerit"
-    printMsg "interdum nibh. Morbi fermentum felis a feugiat dictum."
+function generateHeartbeat() {
+    generatedAt=$(date +'%Y-%m-%dT%H:%M:%S')
+    dockerVersion=$(docker -v)
+    dockerStats=$(docker stats --no-stream --all)
+    diskUsage=$(df -h /)
+    # shellcheck disable=SC2002
+    memoryStats=$(cat /proc/meminfo | grep -E "Mem|Cached|Swap|ctive")
+    totalUptime="$(uptime) [1m, 5m, 15m]"
+    spacer="$(printSpacer)"
+
+    STATS_FILE=${STATS_FILE:-/usr/share/nginx/html/stats.txt}
+
+    printMsg "HEARTBEAT LOG AT ${generatedAt}"
+
+    printMsg ""
+    printMsg "${spacer}"
+    printMsg "Docker version"
+    printMsg "${spacer}"
+    printMsg "${dockerVersion}"
+
+    printMsg ""
+    printMsg "${spacer}"
+    printMsg "Uptime"
+    printMsg "${spacer}"
+    printMsg "${totalUptime}"
+
+    printMsg "${spacer}"
+    printMsg "Containers stats"
+    printMsg "${spacer}"
+    printMsg "${dockerStats}"
+
+    printMsg ""
+    printMsg "${spacer}"
+    printMsg "Disk Usage"
+    printMsg "${spacer}"
+    printMsg "${diskUsage}"
+
+    printMsg ""
+    printMsg "${spacer}"
+    printMsg "Memory Usage"
+    printMsg "${spacer}"
+    printMsg "${memoryStats}"
+
+    printMsg ""
+    printMsg "END OF LOG"
 }

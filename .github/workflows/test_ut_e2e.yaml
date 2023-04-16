@@ -17,8 +17,6 @@ jobs: # Docs: <https://git.io/JvxXE>
   run-ats:
     name: Run the Unit Tests (UTs) and the End-to-End (E2E) Automated Test (AT)
     runs-on: ubuntu-20.04
-    env:
-      RUN_CONTAINER_FOREVER: 1
     steps:
       - name: Check out code
         uses: actions/checkout@v3
@@ -27,7 +25,7 @@ jobs: # Docs: <https://git.io/JvxXE>
         run: >
           docker build
           --file ./Dockerfile
-          --tag bash-container-template:local
+          --tag docker-containers-monitor:local
           --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
           --build-arg BUILD_VERSION=${{ github.event.release.tag_name }}
           --build-arg VCS_REF=${GITHUB_SHA}
@@ -36,21 +34,13 @@ jobs: # Docs: <https://git.io/JvxXE>
       - name: Try to run container
         run: >
           docker run -d --rm
-          --env RUN_CONTAINER_FOREVER="$RUN_CONTAINER_FOREVER"
-          --name bash-container-template
-          bash-container-template:local
+          -v /var/run/docker.sock:/var/run/docker.sock:ro
+          --net=host
+          --name docker-containers-monitor
+          docker-containers-monitor:local
 
       - name: Run the Unit Tests (UTs)
-        run: docker exec -i bash-container-template sh -c "./run_tests.sh"
+        run: docker exec -i docker-containers-monitor sh -c "./run_unit_tests.sh"
 
       - name: Run the End-to-End (E2E) tests
-        run: |
-          output=$(docker logs bash-container-template --tail=10 | grep "Dummy service execution completed")
-          if [ "$output" == "" ]; then
-            echo "Container output test failed!"
-            exit 1
-          else
-            echo "Container output test succeeded!"
-          fi
-
-          docker exec -i bash-container-template sh -c "./run_tests.sh"
+        run: ./scripts/run_e2e_tests.sh
