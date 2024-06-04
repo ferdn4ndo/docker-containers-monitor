@@ -1,23 +1,10 @@
 ignore:
   # Not fixed yet (comes from nginx-alpine)
-  - vulnerability: CVE-2023-42364-busybox
-  # Not fixed yet (comes from nginx-alpine)
-  - vulnerability: CVE-2023-42364-busybox-binsh
-  # Not fixed yet (comes from nginx-alpine)
-  - vulnerability: CVE-2023-42364-ssl_client
-  # Not fixed yet (comes from nginx-alpine)
-  - vulnerability: CVE-2023-42365-busybox
-  # Not fixed yet (comes from nginx-alpine)
-  - vulnerability: CVE-2023-42365-busybox-binsh
-  # Not fixed yet (comes from nginx-alpine)
-  - vulnerability: CVE-2023-42365-ssl_client
-  # Not fixed yet (comes from nginx-alpine)
-  - vulnerability: CVE-2024-0853-curl
-  # Not fixed yet (comes from nginx-alpine)
-  - vulnerability: CVE-2024-2004-curl
-  # Not fixed yet (comes from nginx-alpine)
-  - vulnerability: CVE-2024-2398-curl
-  # Not fixed yet (comes from nginx-alpine)
-  - vulnerability: CVE-2024-2466-curl
-  # Not fixed yet (comes from nginx-alpine)
-  - vulnerability: CVE-2024-28182-nghttp2-libs
+  - vulnerability: CVE-2016-2781
+  - vulnerability: CVE-2023-42364
+  - vulnerability: CVE-2023-42365
+  - vulnerability: CVE-2024-0853
+  - vulnerability: CVE-2024-2004
+  - vulnerability: CVE-2024-2398
+  - vulnerability: CVE-2024-2466
+  - vulnerability: CVE-2024-28182
