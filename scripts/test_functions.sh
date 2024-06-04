@@ -14,7 +14,7 @@ testGenerateHeartbeat() {
     printMsg "Testing the generateHeartbeat method"
 
     exec 5>&1
-    output=$(generateHeartbeat)
+    output=$(generateHeartbeat echo "Default command successfully executed")
 
     assertStringContains "${output}" "Docker version"
 
@@ -53,6 +53,9 @@ testGenerateHeartbeat() {
     assertStringContains "${output}" "Inactive"
     assertStringContains "${output}" "SwapTotal"
     assertStringContains "${output}" "SwapFree"
+
+    assertStringContains "${output}" "Command Output"
+    assertStringContains "${output}" "Default command successfully executed"
 }
 
 if [ -z "$1" ]; then
