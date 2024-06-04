@@ -25,7 +25,7 @@ else
 fi
 
 printMsg "Entering nohup watch loop every $REFRESH_EVERY_SECONDS seconds"
-nohup watch -n"$REFRESH_EVERY_SECONDS" "sh /scripts/refresh.sh $@" > /dev/null & tail -f "$FIFO_PATH"
+nohup watch -n"$REFRESH_EVERY_SECONDS" "sh /scripts/refresh.sh $*" > /dev/null & tail -f "$FIFO_PATH"
 
 printMsg "Reading the custom pipe output"
 tail -f "$FIFO_PATH"
