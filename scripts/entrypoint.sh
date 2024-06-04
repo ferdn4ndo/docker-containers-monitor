@@ -6,7 +6,7 @@ set -o pipefail
 # shellcheck disable=SC1091
 source ./functions.sh
 
-printHeader "Docker Conatiners Monitor"
+printHeader "Docker Containers Monitor"
 
 printMsg "Starting the Nginx server"
 nginx
@@ -24,6 +24,7 @@ else
     mkfifo "$FIFO_PATH"
 fi
 
+printMsg "Entering nohup watch loop every $REFRESH_EVERY_SECONDS seconds"
 nohup watch -n"$REFRESH_EVERY_SECONDS" "sh /scripts/refresh.sh" > /dev/null & tail -f "$FIFO_PATH"
 
 printMsg "Reading the custom pipe output"
