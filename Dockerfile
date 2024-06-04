@@ -1,4 +1,4 @@
-FROM nginx:1.23.4-alpine
+FROM nginx:1.27.0-alpine
 LABEL maintaner="Fernando Constantino <const.fernando@gmail.com>"
 
 ARG BUILD_DATE
@@ -37,3 +37,5 @@ ADD default.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80
 
 ENTRYPOINT ["sh", "entrypoint.sh"]
+
+CMD [ "echo", "Default command successfully executed" ]

@@ -53,6 +53,17 @@ function generateHeartbeat() {
     printMsg "${spacer}"
     printMsg "${memoryStats}"
 
+    commandOutput="(EMPTY)"
+    if [ $# -gt 0 ]
+    then
+        commandOutput=$(exec "$@")
+        printMsg ""
+        printMsg "${spacer}"
+        printMsg "Command Output"
+        printMsg "${spacer}"
+        printMsg "${commandOutput}"
+    fi
+
     printMsg ""
     printMsg "END OF LOG"
 }

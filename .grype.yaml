@@ -1,3 +1,10 @@
 ignore:
-  # Not going to be fixed - check https://security-tracker.debian.org/tracker/CVE-2016-2781
+  # Not fixed yet (comes from nginx-alpine)
   - vulnerability: CVE-2016-2781
+  - vulnerability: CVE-2023-42364
+  - vulnerability: CVE-2023-42365
+  - vulnerability: CVE-2024-0853
+  - vulnerability: CVE-2024-2004
+  - vulnerability: CVE-2024-2398
+  - vulnerability: CVE-2024-2466
+  - vulnerability: CVE-2024-28182
