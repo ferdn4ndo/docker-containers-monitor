@@ -3,9 +3,9 @@
 
 ## Checklist :rotating_light:
 <!-- Check all items that apply. -->
-- [ ] My code follow the code style
+- [ ] My code follows the code style
 - [ ] Created all unit tests needed
 - [ ] All lints and tests passed correctly locally
-- [ ] I've upgraded code version and release notes
+- [ ] I upgraded dependencies to the latest working version
 
 :heart: Thank you!
